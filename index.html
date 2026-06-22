@@ -24,6 +24,7 @@
 
         /* ── основная карточка ── */
         .maintenance-card {
+            position: relative;
             max-width: 700px;
             width: 100%;
             background: rgba(22, 28, 46, 0.75);
@@ -37,6 +38,46 @@
                 inset 0 1px 2px rgba(255, 255, 255, 0.06);
             border: 1px solid rgba(255, 255, 255, 0.04);
             transition: transform 0.3s ease;
+        }
+
+        /* ── переключатель языков ── */
+        .lang-switcher {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #b0c0e0;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            letter-spacing: 0.04em;
+            backdrop-filter: blur(4px);
+            background: rgba(20, 28, 48, 0.5);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .lang-btn:hover {
+            background: rgba(74, 124, 247, 0.2);
+            border-color: rgba(74, 124, 247, 0.3);
+            color: #f0f4ff;
+            transform: scale(1.03);
+        }
+
+        .lang-btn.active {
+            background: #4a7cf7;
+            border-color: #4a7cf7;
+            color: #fff;
+            box-shadow: 0 0 16px rgba(74, 124, 247, 0.3);
         }
 
         /* ── иконка / шестерёнка (анимированная) ── */
@@ -139,6 +180,7 @@
             justify-content: center;
             gap: 4px;
             font-weight: 300;
+            margin-bottom: 24px;
         }
 
         .status-text .dots span {
@@ -173,7 +215,7 @@
         /* ── мелкий футер ── */
         .footer-note {
             margin-top: 30px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: #4a5a7a;
             letter-spacing: 0.04em;
             border-top: 1px solid rgba(255, 255, 255, 0.04);
@@ -233,7 +275,7 @@
         }
 
         /* ── адаптив ── */
-        @media (max-width: 480px) {
+        @media (max-width: 580px) {
             .maintenance-card {
                 padding: 40px 20px 30px;
                 border-radius: 32px;
@@ -248,6 +290,19 @@
                 width: 8px;
                 height: 32px;
             }
+            .lang-switcher {
+                top: 14px;
+                right: 16px;
+                gap: 5px;
+            }
+            .lang-btn {
+                font-size: 0.7rem;
+                padding: 4px 10px;
+            }
+            .footer-note {
+                font-size: 0.75rem;
+                gap: 5px;
+            }
         }
     </style>
 </head>
@@ -255,12 +310,19 @@
 
     <div class="maintenance-card">
 
+        <!-- переключатель языков -->
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="ru">RU</button>
+            <button class="lang-btn" data-lang="ua">UA</button>
+            <button class="lang-btn" data-lang="en">EN</button>
+        </div>
+
         <!-- анимированная шестерёнка -->
         <div class="gear-icon">⚙️</div>
 
         <!-- главный заголовок -->
-        <h1>Технические работы</h1>
-        <p class="sub">на сайте &nbsp;·&nbsp; скоро всё заработает</p>
+        <h1 data-i18n="heading">Технические работы</h1>
+        <p class="sub" data-i18n="sub">на сайте · скоро всё заработает</p>
 
         <!-- индикаторы-полоски -->
         <div class="loader-group">
@@ -273,7 +335,7 @@
 
         <!-- статус с анимированными точками -->
         <div class="status-text">
-            <span>Идёт обновление</span>
+            <span data-i18n="status">Идёт обновление</span>
             <span class="dots">
                 <span>.</span>
                 <span>.</span>
@@ -281,15 +343,83 @@
             </span>
         </div>
 
-        <!-- нижняя строка с мини-анимациями -->
+        <!-- нижняя строка: извинения + "команда разработчиков Restart group" + сердечко + shine -->
         <div class="footer-note">
-            <span>приносим извинения</span>
+            <span data-i18n="footer-apology">приносим извинения</span>
             <span class="heart">♥</span>
-            <span>команда разработчиков</span>
+            <span data-i18n="footer-team">команда разработчиков Restart group</span>
             <span class="shine"></span>
         </div>
 
     </div>
+
+    <script>
+        (function() {
+            // ── словарь переводов ──
+            const translations = {
+                ru: {
+                    heading: 'Технические работы',
+                    sub: 'на сайте · скоро всё заработает',
+                    status: 'Идёт обновление',
+                    'footer-apology': 'приносим извинения',
+                    'footer-team': 'команда разработчиков Restart group'
+                },
+                ua: {
+                    heading: 'Технічні роботи',
+                    sub: 'на сайті · скоро все запрацює',
+                    status: 'Йде оновлення',
+                    'footer-apology': 'вибачте',
+                    'footer-team': 'команда розробників Restart group'
+                },
+                en: {
+                    heading: 'Technical Maintenance',
+                    sub: 'on the site · will be back soon',
+                    status: 'Updating',
+                    'footer-apology': 'we apologize',
+                    'footer-team': 'developer team Restart group'
+                }
+            };
+
+            // ── элементы с data-i18n ──
+            const i18nElements = document.querySelectorAll('[data-i18n]');
+            const langButtons = document.querySelectorAll('.lang-btn');
+
+            // ── текущий язык (по умолчанию русский) ──
+            let currentLang = 'ru';
+
+            // ── функция смены языка ──
+            function setLanguage(lang) {
+                if (!translations[lang]) return;
+                currentLang = lang;
+
+                // обновить тексты
+                i18nElements.forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (translations[lang][key] !== undefined) {
+                        el.textContent = translations[lang][key];
+                    }
+                });
+
+                // обновить активную кнопку
+                langButtons.forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.lang === lang);
+                });
+            }
+
+            // ── обработчики кликов по кнопкам ──
+            langButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    const lang = this.dataset.lang;
+                    if (lang && lang !== currentLang) {
+                        setLanguage(lang);
+                    }
+                });
+            });
+
+            // ── установить язык по умолчанию (RU) ──
+            setLanguage('ru');
+        })();
+    </script>
 
 </body>
 </html>
